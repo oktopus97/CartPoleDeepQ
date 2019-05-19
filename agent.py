@@ -66,13 +66,11 @@ class Agent(object):
         expected_q.requires_grad = True
         
         loss = self.loss_func(state_action_values.squeeze(),expected_q)
-        print('lolo')
 
         self.optimizer.zero_grad()
         loss.backward()
 
         self.optimizer.step()
-        print('lolo')
         
 
 
