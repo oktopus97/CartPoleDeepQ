@@ -2,12 +2,13 @@
 
 import gym
 
-def total_reward(state,reward_e):
+def total_reward(state,reward_e, timestep):
     """
-    conpute the total reward for CartPole-v0 (reward_i is computed with the angle position range: [-41.8deg,41.8deg]
+    compute the total reward for CartPole-v0 (reward_i is computed with the angle position range: [-41.8deg,41.8deg]
+    if the agent lives more then it will receive more rewards
+    """
 
-    """
-    return reward_e + abs(state[2])
+    return reward_e + timestep/20
 
 
 
@@ -18,9 +19,9 @@ class Environment(object):
     def render(self):
         self.env.render()
 
-    def step(self, action):
+    def step(self, action, timestep):
         state, reward_e, done, info = self.env.step(action)
-        return state, total_reward(state, reward_e), done, info
+        return state, total_reward(state, reward_e, timestep), done, info
 
     def initialize(self):
         return self.env.reset()
