@@ -11,7 +11,7 @@ from network import DeepQNetwork
 from replaymemory import Memory
 import torch.autograd as autograd
 import torch.optim as optim
-from torch.nn import SmoothL1Loss as Loss
+from torch.nn import SmoothL1Loss
 import torch.nn.functional as F
 import torch
 from matplotlib import pyplot as plt
@@ -39,17 +39,15 @@ class Agent(object):
         self.no_training_steps = 0
 
         self.optimizer = optim.RMSprop(self.network.parameters(), lr=LR)
-        self.loss_func = Loss()
+        self.loss_func = SmoothL1Loss()
 
 
-
-
-    def interact(self, action, timestep):
+    def interact(self, state, action):
         """
         returns:
         state, reward, done, info
         """
-        return self.env.step(action, timestep)
+        return self.env.step(action, state)
 
     def select_action(self,state):
         ##epsilon greedy policy
@@ -104,8 +102,7 @@ class Agent(object):
 
 
         """
-
-
+        
     def train(self, num_episodes):
 
         end_state = np.array([0,0,0,0])
@@ -122,11 +119,11 @@ class Agent(object):
 
             while not done:
                 if state is end_state:
-
                     state = self.env.initialize()
 
+                self.env.render()
                 action = self.select_action(state)
-                _state, reward, done, _ = self.interact(action.item(), timesteps)
+                _state, reward, done, _ = self.interact(action.item(), state)
                 rewards.append(reward)
 
                 timesteps += 1
@@ -137,7 +134,7 @@ class Agent(object):
                     sum_rewards.append(sum_reward)
 
                     mean_loss = loss / timesteps
-                    
+
                     writer.add_scalar('duration of episode', timesteps, episode)
                     writer.add_scalar('mean reward of episode', sum_reward, episode)
                     writer.add_scalar('mean loss of episode', mean_loss, episode)
@@ -166,7 +163,7 @@ class Agent(object):
 if __name__ == '__main__':
     agent_smith = Agent()
     print('agent initiated')
-    agent_smith.train(1000000)
+    agent_smith.train(10000)
     f, (ax1, ax2) = plt.subplots(1, 2)
     ax1.plot(timesalive)
     ax2.plot(losses)

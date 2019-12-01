@@ -11,14 +11,16 @@ class DeepQNetwork(nn.Module):
         self.no_inputs = no_inputs
 
         self.input_layer = nn.Linear(no_inputs,24)
-        self.layer1 = nn.Linear(24,8)
+        self.layer1 = nn.Linear(24,24)
+        self.layer2 = nn.Linear(24,8)
         self.out_layer = nn.Linear(8,no_outputs)
 
     def forward(self, state):
         state = state.view(-1, self.no_inputs)
         state = F.relu(self.input_layer(state))
         state = F.relu(self.layer1(state))
-        return F.softmax(self.out_layer(state))
+        state = F.relu(self.layer2(state))
+        return self.out_layer(state)
 
     def getParameters(self):
         return tuple(self.parameters())
